@@ -8,6 +8,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Создание заявления</title>
+    @Vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
     <h1>Новое заявление</h1>
