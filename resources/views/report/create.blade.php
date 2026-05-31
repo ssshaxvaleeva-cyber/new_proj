@@ -1,5 +1,8 @@
 <x-app-layout>
-    <h1>Новое заявление</h1>
+    <x-slot name="header">
+        <h2>Новое заявление</h2>
+    </x-slot>
+
 
     <form method="POST" action="{{ route('reports.store') }}">
         @csrf

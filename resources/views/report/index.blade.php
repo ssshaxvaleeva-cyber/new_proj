@@ -1,19 +1,8 @@
 <x-app-layout>
-    <div>
-        <span>Сортировка по дате создания: </span>
-        <a href="{{ route('reports.index', ['sort' => 'desc', 'status' => $status]) }}">Сначала новые</a>
-        <a href="{{ route('reports.index', ['sort' => 'asc', 'status' => $status]) }}">Сначала старые</a>
-    </div>
-    <div>
-        <p>Фильтрация по статусу заявки</p>
-        <ul>
-            @foreach ($statuses as $status)
-                <li>
-                    <a href="{{ route('reports.index', ['sort' => $sort, 'status' => $status->id]) }}">{{ $status->name }}</a>
-                </li>
-            @endforeach
-        </ul>
-    </div>
+    <x-slot name="header">
+     <h2>Мои заявления</h2>
+    </x-slot>
+    <x-filter />
     <div class="statement-grid">
         <a href="{{ route('reports.create') }}">Создать заявление</a>
         @foreach ($reports as $report)
@@ -21,7 +10,9 @@
                 <div class="report-number">{{ $report->number }}</div>
                 <div class="report-description">{{ $report->description }}</div>
                 <div class="report-date">{{ $report->created_at }}</div>
-                <div class="report-status">{{ $report->status->name }}</div>
+                <x-status :type="$report->status->id">
+                 {{ $report->status->name }}
+                </x-status>
             </div>
             <form method="POST" action="{{ route('reports.destroy', $report->id) }}">
                 @method('delete')
