@@ -6,6 +6,7 @@ use App\Models\Report;
 use App\Models\Status;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 
 class ReportController extends Controller
 {
@@ -37,38 +38,47 @@ class ReportController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $data = $request->validate([
-            'number'   => 'required|string',
-            'description' => 'required|string',
-        ]);
+{
+    $data = $request->validate([
+        'number' => 'required|string',
+        'description' => 'required|string',
+        'path_img' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+    ]);
 
-        $data['user_id'] = Auth::user()->id;
-        $data['status_id'] = 1; 
-
-        Report::create($data);
-
-        return redirect()->route('reports.index')->with('success', 'Заявка создана');
+    if ($request->hasFile('path_img')) {
+        $file = $request->file('path_img');
+        $filename = time() . '.' . $file->getClientOriginalExtension();
+        $file->move(public_path('images'), $filename);
+        $data['path_img'] = $filename;
     }
+
+    $data['user_id'] = Auth::user()->id;
+    $data['status_id'] = 1;
+
+    Report::create($data);
+
+    return redirect()->route('reports.index')->with('success', 'Заявка создана');
+}
 
     public function edit(Report $report)
     {
-        if (Auth::user()->id !== $report->user_id) {
-            abort(403, 'У вас нет прав на редактирование этой записи.');
-        }
         return view('report.edit', compact('report'));
     }
 
     public function update(Request $request, Report $report)
     {
-        if (Auth::user()->id !== $report->user_id) {
-            abort(403, 'У вас нет прав на изменение этой записи.');
-        }
-
         $data = $request->validate([
-            'number'   => 'required|string',
+            'number' => 'required|string',
             'description' => 'required|string',
+            'path_img' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
+
+        if ($request->hasFile('path_img')) {
+            $file = $request->file('path_img');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('images'), $filename);
+            $data['path_img'] = $filename;
+        }
 
         $report->update($data);
 
